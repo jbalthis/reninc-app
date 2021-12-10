@@ -4,16 +4,15 @@ import {
         Button, 
         Collapsible, 
         Heading,
-        Image,
-        Form,
-        FormField,
-        TextInput,
+        List,
         Grommet,
         Layer,
         ResponsiveContext 
       } from 'grommet';
 import { FormClose, Notification } from 'grommet-icons';
-import { AppBar } from './components/Appbar';
+import { AppBar } from './components/AppBar';
+import { SearchForm } from './components/SearchForm';
+import { SearchResultsList } from './components/SearchResultsList';
 
 const theme = {
   global: {
@@ -35,31 +34,20 @@ class App extends Component {
     this.state = { 
       apiResponse: "",
       showSidebar: false,
-      value: ""
     };
   }
 
-  callAPI() {
-    fetch("http://localhost:9000/search")
-      .then(res => res.text())
-      .then(res => this.setState({ apiResponse: res }))
-      .catch(err => err);
-  }
-
-  componentDidMount() {
-    this.callAPI();
+  handleCallback = (childData) => {
+    this.setState({apiResponse: childData})
   }
 
   setShowSidebar(){
     this.setState({ showSidebar: !this.state.showSidebar})
   }
 
-  setValue(value){
-
-  }
 
   render() {
-    
+    const { apiResponse } = this.state;
     return(
       <Grommet theme={theme} full>
         <ResponsiveContext.Consumer>
@@ -75,22 +63,12 @@ class App extends Component {
                 />
               </AppBar>
               <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
-                <Box flex align='center' justify='center'>
-                  <Form
-                    value={this.state.value}
-                    onChange={nextValue => this.setValue(nextValue)}
-                    onReset={() => this.setValue({})}
-                    onSubmit={() => this.setValue(this.value)}
-                  >
-                    <FormField name="name" htmlFor="text-input-id" label="Name">
-                      <TextInput id="text-input-id" name="name" />
-                    </FormField>
-                    <Box direction="row" gap="medium">
-                      <Button type="submit" primary label="Submit" />
-                      <Button type="reset" label="Reset" />
-                    </Box>
-                  </Form>
-                  <p className="App-intro"><br />***For Debugging***<br />API response:<br />{this.state.apiResponse}</p>
+                <Box flex align='center' justify='center' gap="medium">
+                  <SearchForm parentCallback={ this.handleCallback } />
+                </Box>
+                <Box flex align='center' justify='center' gap="medium">
+                  {console.log(apiResponse.split("},{"))}
+                  <List data={apiResponse.split("},{")} />
                 </Box>
                 {(!this.state.showSidebar || size !== 'small') ? (
                   <Collapsible direction="horizontal" open={this.state.showSidebar}>
